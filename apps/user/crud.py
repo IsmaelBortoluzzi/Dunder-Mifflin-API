@@ -10,9 +10,10 @@ from .models import User
 async def user_exists(s, id=None, email=None):
     if id:
         exists_query = select(User).where(User.id == id).exists()
-        
     elif email:
         exists_query = select(User).where(User.email == email).exists()
+    else:
+        raise ValueError('You must pass "id" or "email" parametar')
 
     query = await s.execute(select(User).where(exists_query))
     return query.first()
