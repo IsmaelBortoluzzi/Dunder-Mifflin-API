@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from databases.utils import reset_database
 from apps.user.views import router_user
+from apps.product.views import router_product
 
 
 tags_metadata = [
@@ -39,6 +39,7 @@ app.add_middleware(
 )
 
 app.include_router(router_user)
+app.include_router(router_product)
 
 
 if __name__ == "__main__":

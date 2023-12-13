@@ -66,6 +66,9 @@ class City(BaseModel):
     uf_id: int
 
 
+####### END ADDRESS MODELS #######
+
+
 class Address(BaseModel):
     id: int
     number: str = Field(example='1045')
@@ -73,3 +76,23 @@ class Address(BaseModel):
     zip_code: str
     city_id: int
     user_id: int
+
+
+class CreateAddressReq(BaseModel):
+    number: str = Field(example='1045')
+    street_name: str
+    zip_code: str
+    city_id: int
+    user_id: int
+
+
+class CreateAddressRes(BaseModel):
+    id: int
+    number: str
+    street_name: str
+    zip_code: str
+    city_id: int
+    user: RetrieveUserRes
+
+
+####### END ADDRESS MODELS #######

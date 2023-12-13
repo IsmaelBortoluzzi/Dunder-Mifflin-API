@@ -6,6 +6,10 @@ class Product(BaseModel):
     name: str
 
 
+class CreateProductReq(BaseModel):
+    name: str = Field(example="A4 Paper")
+
+
 class ProductVariation(BaseModel):
     id: int
     product_id: int
@@ -14,7 +18,17 @@ class ProductVariation(BaseModel):
     active: bool
     size: str | None
     color: str | None
-    price: str | None
+    price: float
+
+
+class CreateProductVariationReq(BaseModel):
+    product_id: int = Field(example=1)
+    sku: int = Field(example="12345")
+    description: str | None = Field(example="Paper for printing")
+    active: bool = Field(example=True)
+    size: str | None = Field(example="20x30")
+    color: str | None = Field(example=None)
+    price: float = Field(example=20.99)
 
 
 class ProductOrder(BaseModel):

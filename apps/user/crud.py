@@ -1,8 +1,9 @@
+from sqlalchemy import delete
 from databases.sql_db import session
 from databases.decorators import with_session
 from sqlalchemy.future import select
 import datetime
-from .models import User
+from .models import Address, User
 
 
 @with_session(session)
@@ -65,3 +66,32 @@ async def update_user(s, id=None, user=None):
     return current_user
 
 
+@with_session(session)
+async def address_exists(s, id=None):
+    if id:
+        exists_query = select(Address).where(Address.id == id).exists()
+    else:
+        raise ValueError('You must pass "id" parameter')
+
+    query = await s.execute(select(Address).where(exists_query))
+    return query.first()
+
+
+@with_session(session)
+async def create_address(s, address):
+    new_address = Address(**address.dict())
+
+    s.add(new_address)
+    await s.commit()
+    await s.refresh(new_address)
+
+    return new_address
+
+
+@with_session(session)
+async def delete_address(s, id=None):
+    if id is None:
+        raise ValueError('You must pass "id" parameter')
+
+    await s.execute(delete(Address).where(Address.id == id))
+    await s.commit()

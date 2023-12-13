@@ -67,7 +67,7 @@ class Address(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
 
     city = relationship("City", back_populates="addresses")
-    user = relationship("User", back_populates="addresses")
+    user = relationship("User", back_populates="addresses", lazy='joined')
     orders = relationship("Order", back_populates="delivery_address")
 
     def __repr__(self):

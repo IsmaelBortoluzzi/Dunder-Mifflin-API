@@ -14,11 +14,13 @@ class Order(Base):
     create_date = Column(DateTime, default=datetime.datetime.now())
     update_date = Column(DateTime, nullable=True)
     delivery_address_id = Column(Integer, ForeignKey("address.id"))
-
+    status = Column(Integer)
     products = relationship("ProductVariation", secondary="product_order", back_populates="orders")
     user = relationship("User", back_populates="orders")
-    delivery_address = relationship("Address", back_populates="orders")
+    delivery_address = relationship("Address", back_populates="orders", lazy="joined")
 
+    STATUS_CHOICES = [(0, "Cancelled"), (1, "New"), (2, "In Process"), (3, "Shipped"), (4, "Complete")]
 
     def calculate_total(self):
         pass
+    
