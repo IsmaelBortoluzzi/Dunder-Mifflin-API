@@ -5,17 +5,19 @@ import datetime
 
 
 class Order(Base):
-    __tablename__ = 'order'
+    __tablename__ = "order"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
     total = Column(Double(precision=8))
-    obs = Column(String(length=1024), default='')
+    obs = Column(String(length=1024), default="")
     create_date = Column(DateTime, default=datetime.datetime.now())
     update_date = Column(DateTime, nullable=True)
-    
-    products = relationship('ProductVariation', secondary='product_order', back_populates='orders')
-    user = relationship('User', back_populates='orders')
+    delivery_address_id = Column(Integer, ForeignKey("address.id"))
+
+    products = relationship("ProductVariation", secondary="product_order", back_populates="orders")
+    user = relationship("User", back_populates="orders")
+    delivery_address = relationship("Address", back_populates="orders")
 
 
     def calculate_total(self):

@@ -28,6 +28,30 @@ class CreateUserRes(BaseModel):
     create_date: datetime
 
 
+class RetrieveUserRes(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    active: bool
+    create_date: datetime
+    update_date: datetime | None
+
+
+class UpdateUserReq(BaseModel):
+    full_name: str | None
+    email: EmailStr | None
+    password: str | None
+
+
+class UpdateUserRes(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    active: bool
+    create_date: datetime
+    update_date: datetime
+
+
 ####### END USER MODELS #######
 
 class Uf(BaseModel):

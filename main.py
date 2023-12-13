@@ -5,8 +5,6 @@ from databases.utils import reset_database
 from apps.user.views import router_user
 
 
-# reset_database()
-
 tags_metadata = [
     {
         "name": "User",
@@ -44,6 +42,8 @@ app.include_router(router_user)
 
 
 if __name__ == "__main__":
+    # reset_database()
+
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
