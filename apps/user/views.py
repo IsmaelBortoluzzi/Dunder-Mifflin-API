@@ -10,7 +10,7 @@ router_user = APIRouter(prefix="/user")
 @router_user.post("/create/", response_model=CreateUserRes, status_code=status.HTTP_201_CREATED, responses=ERROR_400, tags=["User"])
 async def create_user(user: CreateUserReq):
     user_exists = await crud.user_exists(email=user.email)
-    print(user_exists)
+
     if user_exists:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "User with this email already exists!"})
 
