@@ -9,7 +9,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     full_name = Column(String(length=64))
-    email = Column(String(length=128))
+    email = Column(String(length=128), unique=True)
     password = Column(String(length=64))
     active = Column(Boolean, default=True)
     create_date = Column(DateTime, default=datetime.datetime.now())
@@ -32,7 +32,7 @@ class Uf(Base):
     abbreviation = Column(String(length=2))
     name = Column(String(length=128))
 
-    citis = relationship('City', back_populates='uf')
+    cities = relationship('City', back_populates='uf')
 
 
 class City(Base):
@@ -42,7 +42,7 @@ class City(Base):
     name = Column(String(length=128))
     uf_id = Column(Integer, ForeignKey('uf.id'))
 
-    uf = relationship('Uf', back_populates='city')
+    uf = relationship('Uf', back_populates='cities')
     addresses = relationship('Address', back_populates='city')
 
 
@@ -56,6 +56,6 @@ class Address(Base):
     city_id = Column(Integer, ForeignKey('city.id'))
     user_id = Column(Integer, ForeignKey('user.id'))
 
-    city = relationship('City', back_populates='address')
-    user = relationship('User', back_populates='address')
+    city = relationship('City', back_populates='addresses')
+    user = relationship('User', back_populates='addresses')
 

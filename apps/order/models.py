@@ -14,8 +14,8 @@ class Order(Base):
     create_date = Column(DateTime, default=datetime.datetime.now())
     update_date = Column(DateTime, nullable=True)
     
-    products = relationship('ProducVariation', secondary='product_order', back_populates='order')
-    user = relationship('User', back_populates='order')
+    products = relationship('ProductVariation', secondary='product_order', back_populates='orders')
+    user = relationship('User', back_populates='orders')
 
 
     def calculate_total(self):

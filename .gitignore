@@ -3,3 +3,4 @@
 **.vscode/
 venv/
 db.db
+.volumes/

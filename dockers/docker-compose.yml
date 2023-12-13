@@ -1,0 +1,23 @@
+version: "3.3"
+
+services:
+
+  postgres:
+    container_name: dm_postgres
+    image: postgres:14.3
+    restart: always
+    environment:
+      - POSTGRES_USER=dm_user
+      - POSTGRES_PASSWORD=dm_password
+      - POSTGRES_DB=dm_database
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.volumes/postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  .postgres_data:
+
+networks:
+  mongo-compose-network:
+      driver: bridge

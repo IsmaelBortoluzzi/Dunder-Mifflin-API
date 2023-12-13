@@ -24,8 +24,8 @@ class ProductVariation(Base):
     color = Column(String(length=32), nullable=True)
     price = Column(Double(precision=8))
 
-    product = relationship('Product', back_populates='product_variation')
-    orders = relationship('Order', secondary='product_order', back_populates='product_variation')
+    product = relationship('Product', back_populates='product_variations')
+    orders = relationship('Order', secondary='product_order', back_populates='products')
 
 
 class ProductOrder(Base):

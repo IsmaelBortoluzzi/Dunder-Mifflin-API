@@ -1,21 +1,39 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
+
+
+####### USER MODELS #######
 
 
 class User(BaseModel):
     id: int
     full_name: str
-    email: str
+    email: EmailStr
     password: str
     active: bool
     create_date: datetime
     update_date: datetime
 
 
+class CreateUserReq(BaseModel):
+    full_name: str = Field(example="Dwight Schrute")
+    email: EmailStr = Field(example="schrute@schrutefarms.com")
+    password: str = Field(example="BEET")
+
+
+class CreateUserRes(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    create_date: datetime
+
+
+####### END USER MODELS #######
+
 class Uf(BaseModel):
     id: int  
-    abbreviation: str = Field(examples='SC')
-    name: str = Field(examples='Santa Catarina')
+    abbreviation: str = Field(example='SC')
+    name: str = Field(example='Santa Catarina')
 
 
 class City(BaseModel):
@@ -26,7 +44,7 @@ class City(BaseModel):
 
 class Address(BaseModel):
     id: int
-    number: str = Field(examples='1045')
+    number: str = Field(example='1045')
     street_name: str
     zip_code: str
     city_id: int
