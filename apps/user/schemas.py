@@ -66,7 +66,7 @@ class City(BaseModel):
     uf_id: int
 
 
-####### END ADDRESS MODELS #######
+####### ADDRESS MODELS #######
 
 
 class Address(BaseModel):
