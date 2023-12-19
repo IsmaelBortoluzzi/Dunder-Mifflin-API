@@ -66,9 +66,25 @@ async def delete_product_variation(s, id=None):
 
 
 @with_session(session)
-async def list_product_variation(s, skip, limit):
+async def list_product(s, skip, limit):
     products = await s.execute(
-        select(ProductVariation).order_by(ProductVariation.id).offset(skip).limit(limit)
+        select(Product)
+            .order_by(Product.id)
+            .offset(skip)
+            .limit(limit)
     )
 
-    return products.all()
+    return products.scalars().all()
+
+
+@with_session(session)
+async def list_product_variation(s, product_id, skip, limit):
+    products = await s.execute(
+        select(ProductVariation)
+            .where(ProductVariation.product_id == product_id)
+            .order_by(ProductVariation.id)
+            .offset(skip)
+            .limit(limit)
+    )
+
+    return products.scalars().all()

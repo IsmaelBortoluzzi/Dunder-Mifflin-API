@@ -12,6 +12,9 @@ class Product(Base):
     
     product_variations = relationship('ProductVariation', back_populates='product')
 
+    def __repr__(self):
+        return f"Product(id={self.id}, name={self.name})"
+
 
 class ProductVariation(Base):
     __tablename__ = 'product_variation'
@@ -27,6 +30,9 @@ class ProductVariation(Base):
 
     product = relationship('Product', back_populates='product_variations', lazy="joined")
     orders = relationship('Order', secondary='product_order', back_populates='products')
+
+    def __repr__(self):
+        return f"ProductVariation(id={self.id}, sku={self.sku}, product_id={self.product_id})"
 
 
 class ProductOrder(Base):

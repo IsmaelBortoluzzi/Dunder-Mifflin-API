@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel, Field
 
 
@@ -10,6 +11,12 @@ class CreateProductReq(BaseModel):
     name: str = Field(example="A4 Paper")
 
 
+class ListProductRes(BaseModel):
+    skip: int
+    limit: int
+    products: List[Product]
+
+
 class ProductVariation(BaseModel):
     id: int
     product_id: int
@@ -19,6 +26,12 @@ class ProductVariation(BaseModel):
     size: str | None
     color: str | None
     price: float
+
+
+class ListProductVariationRes(BaseModel):
+    skip: int
+    limit: int
+    products: List[ProductVariation]
 
 
 class CreateProductVariationReq(BaseModel):
