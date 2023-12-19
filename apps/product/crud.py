@@ -2,7 +2,6 @@ from sqlalchemy.future import select
 from sqlalchemy import delete
 from databases.sql_db import session
 from databases.decorators import with_session
-import datetime
 from .models import Product, ProductVariation
 
 
@@ -64,4 +63,12 @@ async def delete_product_variation(s, id=None):
 
     await s.execute(delete(ProductVariation).where(ProductVariation.id == id))
     await s.commit()
-    
+
+
+@with_session(session)
+async def list_product_variation(s, skip, limit):
+    products = await s.execute(
+        select(ProductVariation).order_by(ProductVariation.id).offset(skip).limit(limit)
+    )
+
+    return products.all()

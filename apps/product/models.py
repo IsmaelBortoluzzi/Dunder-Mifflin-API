@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Double, DateTime, Text, Boolean, Float
 from sqlalchemy.orm import relationship
-from databases.sql_db import Base
+from databases.sql_db import Base, session
+from databases.decorators import with_session
 
 
 class Product(Base):
@@ -24,7 +25,7 @@ class ProductVariation(Base):
     color = Column(String(length=32), nullable=True)
     price = Column(Double(precision=8))
 
-    product = relationship('Product', back_populates='product_variations')
+    product = relationship('Product', back_populates='product_variations', lazy="joined")
     orders = relationship('Order', secondary='product_order', back_populates='products')
 
 
