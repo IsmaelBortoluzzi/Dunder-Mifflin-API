@@ -1,15 +1,15 @@
 from . import crud
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
-from .schemas import CreateProductReq, Product, ProductVariation, CreateProductVariationReq, ListProductRes, ListProductVariationRes
+from . import schemas
 from constants import RESPONSE_ERROR_400_BAD_REQUEST as ERROR_400, RESPONSE_ERROR_404_NOT_FOUND as ERROR_404, MAX_PRODUCT_VARIATION_PER_PAGE
 
 
 router_product = APIRouter(prefix="/product")
 
 
-@router_product.post("/create/", response_model=Product, status_code=status.HTTP_201_CREATED, tags=["Product"])
-async def create_product(product: CreateProductReq):
+@router_product.post("/create/", response_model=schemas.Product, status_code=status.HTTP_201_CREATED, tags=["Product"])
+async def create_product(product: schemas.CreateProductReq):
     new_product = await crud.create_product(product)
     return new_product
 
@@ -24,8 +24,8 @@ async def delete_product(product_id: int):
     await crud.delete_product(product_id)
 
 
-@router_product.post("/variation/create/", response_model=ProductVariation, status_code=status.HTTP_201_CREATED, responses=ERROR_400, tags=["Product"])
-async def create_product_variation(product_variation: CreateProductVariationReq):
+@router_product.post("/variation/create/", response_model=schemas.ProductVariation, status_code=status.HTTP_201_CREATED, responses=ERROR_400, tags=["Product"])
+async def create_product_variation(product_variation: schemas.CreateProductVariationReq):
     product_exists = await crud.product_exists(id=product_variation.product_id)
 
     if not product_exists:
@@ -45,28 +45,28 @@ async def delete_product_variation(product_variation_id: int):
     await crud.delete_product_variation(product_variation_id)
 
 
-@router_product.get("/list/", response_model=ListProductRes, status_code=status.HTTP_200_OK, responses=ERROR_400, tags=["Product"])
+@router_product.get("/list/", response_model=schemas.ListProductRes, status_code=status.HTTP_200_OK, responses=ERROR_400, tags=["Product"])
 async def list_product(skip: int = 0, limit: int = 5):
     if skip >= limit or skip < 0 or limit < 0:
-        return ListProductRes(skip=skip, limit=limit, products=[])
+        return schemas.ListProductRes(skip=skip, limit=limit, products=[])
 
     if limit - skip > MAX_PRODUCT_VARIATION_PER_PAGE:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": f"Product range exceded {MAX_PRODUCT_VARIATION_PER_PAGE}"})
 
     products = await crud.list_product(skip, limit) 
-    return ListProductRes(skip=skip, limit=limit, products=map(lambda p: Product(id=p.id, name=p.name), products))
+    return schemas.ListProductRes(skip=skip, limit=limit, products=map(lambda p: schemas.Product(id=p.id, name=p.name), products))
 
 
-@router_product.get("/variation/list/{product_id}", response_model=ListProductVariationRes, status_code=status.HTTP_200_OK, responses=ERROR_400, tags=["Product"])
+@router_product.get("/variation/list/{product_id}", response_model=schemas.ListProductVariationRes, status_code=status.HTTP_200_OK, responses=ERROR_400, tags=["Product"])
 async def list_product_variation(product_id: int, skip: int = 0, limit: int = 5):
     if skip >= limit or skip < 0 or limit < 0:
-        return ListProductVariationRes(skip=skip, limit=limit, products=[])
+        return schemas.ListProductVariationRes(skip=skip, limit=limit, products=[])
 
     if limit - skip > MAX_PRODUCT_VARIATION_PER_PAGE:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": f"Product range exceded {MAX_PRODUCT_VARIATION_PER_PAGE}"})
 
     products = map(
-        lambda p: ProductVariation(
+        lambda p: schemas.ProductVariation(
             id=p.id,
             product_id=p.product_id,
             sku=p.sku,
@@ -78,5 +78,5 @@ async def list_product_variation(product_id: int, skip: int = 0, limit: int = 5)
         ), 
         await crud.list_product_variation(product_id, skip, limit) 
     )
-    return ListProductVariationRes(skip=skip, limit=limit, products=products)
+    return schemas.ListProductVariationRes(skip=skip, limit=limit, products=products)
 

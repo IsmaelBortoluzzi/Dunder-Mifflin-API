@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from databases.utils import reset_database
 from apps.user.views import router_user
 from apps.product.views import router_product
-
+from apps.order.views import router_order
 
 tags_metadata = [
     {
@@ -40,7 +40,7 @@ app.add_middleware(
 
 app.include_router(router_user)
 app.include_router(router_product)
-
+app.include_router(router_order)
 
 if __name__ == "__main__":
     # reset_database()
