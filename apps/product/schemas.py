@@ -28,6 +28,17 @@ class ProductVariation(BaseModel):
     price: float
 
 
+class ProductVariationWithProduct(BaseModel):
+    id: int
+    product: Product
+    sku: int
+    description: str | None
+    active: bool
+    size: str | None
+    color: str | None
+    price: float
+
+
 class ListProductVariationRes(BaseModel):
     skip: int
     limit: int

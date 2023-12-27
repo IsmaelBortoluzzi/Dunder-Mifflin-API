@@ -20,8 +20,8 @@ async def order_exists(s, id=None):
 
 @with_session(session)
 async def create_order(s, order):
-    product_variation_ids = order.products
-    order.products = []
+    product_variations = order.products
+    del order.products
 
     new_order = Order(**order.dict())
     new_order.create_date = datetime.datetime.now()
@@ -31,13 +31,14 @@ async def create_order(s, order):
     await s.commit()
     await s.refresh(new_order)
 
-    product_order = map(lambda id: ProductOrder(order_id=new_order.id, product_variation_id=id), product_variation_ids)
+    product_order = map(lambda x: ProductOrder(order_id=new_order.id, product_variation_id=x.product_variation_id, quantity=x.quantity), product_variations)
 
     s.add_all(product_order)
     await s.commit()
 
     new_order.total = await new_order.calculate_total()
     await s.flush()
+    await s.commit()
 
     return new_order
 
@@ -50,16 +51,5 @@ async def get_order(s, id=None):
     order = await s.execute(
         select(Order).where(Order.id == id)
     )
-    order = order.scalar()
 
-    products = await s.execute(
-        select(ProductVariation)
-            .select_from(Order)
-            .join(ProductOrder, ProductOrder.order_id == Order.id)
-            .join(ProductVariation, ProductOrder.product_variation_id == ProductVariation.id)
-            .where(Order.id == id)
-    )
-    order.product_list = products.scalars().all()
-
-    return order
-
+    return order.scalar()

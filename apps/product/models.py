@@ -1,7 +1,7 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Double, DateTime, Text, Boolean, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, Double, Text, Boolean
+from sqlalchemy.future import select
 from sqlalchemy.orm import relationship
 from databases.sql_db import Base, session
-from databases.decorators import with_session
 
 
 class Product(Base):
@@ -10,10 +10,20 @@ class Product(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(length=1024))
     
-    product_variations = relationship('ProductVariation', back_populates='product')
+    # product_variations = relationship('ProductVariation', back_populates='product')  # Lazy load does not work with asyncio
 
     def __repr__(self):
         return f"Product(id={self.id}, name={self.name})"
+
+    async def get_variations(self):
+        async with session() as s:   
+            query = await s.execute(
+                select(ProductVariation)
+                    .select_from(Product)
+                    .join(ProductVariation, ProductVariation.product_id == self.id)
+                    .where(Product.id == self.id)
+            )
+            return query.scalars().all()
 
 
 class ProductVariation(Base):
@@ -29,7 +39,7 @@ class ProductVariation(Base):
     price = Column(Double(precision=8))
 
     product = relationship('Product', back_populates='product_variations', lazy="joined")
-    orders = relationship('Order', secondary='product_order', back_populates='products')
+    # orders = relationship('Order', secondary='product_order', back_populates='products')  # Lazy load does not work with asyncio
 
     def __repr__(self):
         return f"ProductVariation(id={self.id}, sku={self.sku}, product_id={self.product_id})"

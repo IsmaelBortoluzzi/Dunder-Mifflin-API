@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from databases.sql_db import Base, session
 from sqlalchemy.sql import functions
 from sqlalchemy.future import select
-from apps.product.models import ProductVariation
+from apps.product.models import ProductOrder, ProductVariation
 
 import datetime
 
@@ -20,8 +20,8 @@ class Order(Base):
     delivery_address_id = Column(Integer, ForeignKey("address.id"))
     status = Column(String(length=32))
 
-    products = relationship("ProductVariation", secondary="product_order", back_populates="orders")
-    user = relationship("User", back_populates="orders")
+    # products = relationship("ProductVariation", secondary="product_order", back_populates="orders")  # Lazy load does not work with asyncio
+    user = relationship("User", back_populates="orders", lazy="joined")
     delivery_address = relationship("Address", back_populates="orders", lazy="joined")
 
     STATUS_CHOICES = ["Cancelled", "New", "In Process", "Shipped", "Complete"]
@@ -29,13 +29,14 @@ class Order(Base):
     async def calculate_total(self):
         async with session() as s:   
             query = await s.execute(
-                select(functions.sum(ProductVariation.price))
-                    .join(Order.products)
+                select(functions.sum(ProductVariation.price * ProductOrder.quantity))
+                    .select_from(Order)
+                    .join(ProductOrder, ProductOrder.order_id == self.id)
+                    .join(ProductVariation, ProductOrder.product_variation_id == ProductVariation.id)
                     .where(Order.id == self.id)
                     .group_by(Order.id)
             )
-            return query.first()[0]
-
+            return query.scalar()
 
     def set_status(self, label):
         for status in self.STATUS_CHOICES:
@@ -44,5 +45,17 @@ class Order(Base):
                 break
         else:
             raise ValueError(f'There are no status with label "{label}"')
+        
+    async def get_products(self):
+        async with session() as s:
+            products = await s.execute(
+                select(ProductVariation)
+                    .select_from(Order)
+                    .join(ProductOrder, ProductOrder.order_id == self.id)
+                    .join(ProductVariation, ProductOrder.product_variation_id == ProductVariation.id)
+                    .where(Order.id == self.id)
+                    .add_columns(ProductOrder.quantity)
+            )
+            return products.scalars().all()
         
 

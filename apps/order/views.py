@@ -18,6 +18,7 @@ async def create_order(order: schemas.CreateOrderReq):
 @router_order.get("/retrieve/{order_id}/", response_model=schemas.RetrieveOrderRes, status_code=status.HTTP_200_OK, responses=ERROR_404, tags=["Order"])
 async def get_order(order_id: int):
     order = await crud.get_order(id=order_id)
+    order.products = await order.get_products()
 
     if not order:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": f"Order with id {order_id} does not exist!"})
