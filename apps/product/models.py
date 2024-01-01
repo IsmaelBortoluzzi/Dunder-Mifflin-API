@@ -38,7 +38,7 @@ class ProductVariation(Base):
     color = Column(String(length=32), nullable=True)
     price = Column(Double(precision=8))
 
-    product = relationship('Product', back_populates='product_variations', lazy="joined")
+    product = relationship('Product', lazy="joined")
     # orders = relationship('Order', secondary='product_order', back_populates='products')  # Lazy load does not work with asyncio
 
     def __repr__(self):

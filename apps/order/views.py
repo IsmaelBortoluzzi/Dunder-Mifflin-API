@@ -18,9 +18,35 @@ async def create_order(order: schemas.CreateOrderReq):
 @router_order.get("/retrieve/{order_id}/", response_model=schemas.RetrieveOrderRes, status_code=status.HTTP_200_OK, responses=ERROR_404, tags=["Order"])
 async def get_order(order_id: int):
     order = await crud.get_order(id=order_id)
-    order.products = await order.get_products()
 
     if not order:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": f"Order with id {order_id} does not exist!"})
 
+    order.products = await order.get_products()
     return order 
+
+
+@router_order.patch("/update/add-product/", response_model=schemas.RetrieveOrderRes, status_code=status.HTTP_200_OK, responses=ERROR_404, tags=["Order"])
+async def order_add_product(order_products: schemas.UpdateOrderAddProductReq):
+    order_exists = await crud.order_exists(id=order_products.id)
+    
+    if not order_exists:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": f"Order with id {order_products.id} does not exist!"})
+
+    order = await crud.add_product(order_products.id, order_products.product)
+    order.products = await order.get_products()
+
+    return order
+
+
+@router_order.patch("/update/remove-product/", response_model=schemas.RetrieveOrderRes, status_code=status.HTTP_200_OK, responses=ERROR_404, tags=["Order"])
+async def order_add_product(order_products: schemas.UpdateOrderAddProductReq):
+    order_exists = await crud.order_exists(id=order_products.id)
+
+    if not order_exists:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": f"Order with id {order_products.id} does not exist!"})
+
+    order = await crud.remove_product(order_products.id, order_products.product)
+    order.products = await order.get_products()
+
+    return order

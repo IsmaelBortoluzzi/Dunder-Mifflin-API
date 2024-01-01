@@ -27,11 +27,11 @@ class Order(Base):
     STATUS_CHOICES = ["Cancelled", "New", "In Process", "Shipped", "Complete"]
 
     async def calculate_total(self):
-        async with session() as s:   
+        async with session() as s:
             query = await s.execute(
                 select(functions.sum(ProductVariation.price * ProductOrder.quantity))
                     .select_from(Order)
-                    .join(ProductOrder, ProductOrder.order_id == self.id)
+                    .join(ProductOrder, ProductOrder.order_id == Order.id)
                     .join(ProductVariation, ProductOrder.product_variation_id == ProductVariation.id)
                     .where(Order.id == self.id)
                     .group_by(Order.id)
@@ -45,17 +45,15 @@ class Order(Base):
                 break
         else:
             raise ValueError(f'There are no status with label "{label}"')
-        
+
     async def get_products(self):
         async with session() as s:
             products = await s.execute(
                 select(ProductVariation)
                     .select_from(Order)
-                    .join(ProductOrder, ProductOrder.order_id == self.id)
+                    .join(ProductOrder, ProductOrder.order_id == Order.id)
                     .join(ProductVariation, ProductOrder.product_variation_id == ProductVariation.id)
                     .where(Order.id == self.id)
                     .add_columns(ProductOrder.quantity)
             )
             return products.scalars().all()
-        
-

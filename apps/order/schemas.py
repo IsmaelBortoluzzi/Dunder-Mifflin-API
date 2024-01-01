@@ -32,19 +32,24 @@ class CreateOrderRes(BaseModel):
     id: int
     user_id: int
     total: float
+    status: str
     obs: str
     create_date: datetime
     delivery_address_id: int
-    status: str
 
 
 class RetrieveOrderRes(BaseModel):
     id: int
     user_id: int
     total: float
+    status: str
     obs: str
     create_date: datetime
     update_date: datetime | None
     delivery_address: Address
-    status: str
     products: List[product_schemas.ProductVariationWithProduct]
+
+
+class UpdateOrderAddProductReq(BaseModel):
+    id: int
+    product: CreateOrderReqProducts = Field(example=CreateOrderReqProducts(product_variation_id=3, quantity=5))

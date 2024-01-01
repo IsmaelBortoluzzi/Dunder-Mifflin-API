@@ -2,7 +2,19 @@ from sqlalchemy.future import select
 from sqlalchemy import delete
 from databases.sql_db import session
 from databases.decorators import with_session
-from .models import Product, ProductVariation
+from apps.order.models import Order
+from .models import Product, ProductVariation, ProductOrder
+
+
+@with_session(session)
+async def get_product_order(s, order_id=None, product_variation_id=None):
+    if order_id and product_variation_id:
+        query = select(ProductOrder).where(ProductOrder.order_id == order_id, ProductOrder.product_variation_id == product_variation_id)
+    else:
+        raise ValueError('You must pass "order_id" and "product_variation_id" parameter')
+
+    query = await s.execute(query)
+    return query.scalars().first()
 
 
 @with_session(session)
