@@ -37,6 +37,7 @@ class ProductVariationWithProduct(BaseModel):
     size: str | None
     color: str | None
     price: float
+    quantity: int
 
 
 class ListProductVariationRes(BaseModel):

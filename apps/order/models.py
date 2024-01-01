@@ -1,10 +1,9 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Double, DateTime
-from sqlalchemy.orm import relationship
-from databases.sql_db import Base, session
-from sqlalchemy.sql import functions
 from sqlalchemy.future import select
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import functions
+from databases.sql_db import Base, session
 from apps.product.models import ProductOrder, ProductVariation
-
 import datetime
 
 
@@ -47,13 +46,17 @@ class Order(Base):
             raise ValueError(f'There are no status with label "{label}"')
 
     async def get_products(self):
+        def add_quantity_and_return(row):
+            setattr(row.ProductVariation, "quantity", row.quantity)
+            return row.ProductVariation
+
         async with session() as s:
             products = await s.execute(
-                select(ProductVariation)
+                select(ProductVariation, ProductOrder.quantity)
                     .select_from(Order)
                     .join(ProductOrder, ProductOrder.order_id == Order.id)
                     .join(ProductVariation, ProductOrder.product_variation_id == ProductVariation.id)
                     .where(Order.id == self.id)
-                    .add_columns(ProductOrder.quantity)
             )
-            return products.scalars().all()
+
+            return [add_quantity_and_return(row) for row in products.all()]
